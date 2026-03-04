@@ -1,0 +1,143 @@
+Turbo Assembler	 Version 4.1	    03/04/26 14:22:12	    Page 1
+crack.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4
+      5	      =0009		     PASS_LEN	     equ 9h	     ; len of password
+      6	      =004A		     RED_YELL	     equ 4ah
+      7	      =002A		     GREEN_YELL	     equ 2ah
+      8
+      9				     locals @@
+     10
+     11	0100  B4 0A		     start:	     mov ah, 0ah
+     12	0102  0E				     push cs
+     13	0103  1F				     pop ds
+     14	0104  BA 0133r				     mov dx, offset buffer
+     15	0107  CD 21				     int 21h
+     16
+     17	0109  E8 009E				     call check
+     18	010C  80 3E 0152r 00			     cmp flag, 0h
+     19	0111  75 0F				     jne @@no_access
+     20	0113  BA 017Fr				     mov dx, offset access
+     21	0116  B4 09				     mov ah, 09h
+     22	0118  CD 21				     int 21h
+     23	011A  B4 2A				     mov ah, GREEN_YELL
+     24	011C  E8 00B6				     call fill
+     25	011F  EB 0D 90				     jmp @@end
+     26
+     27	0122  BA 0153r		       @@no_access:  mov dx, offset wrong
+     28	0125  B4 09				     mov ah, 09h
+     29	0127  CD 21				     int 21h
+     30	0129  B4 4A				     mov ah, RED_YELL
+     31	012B  E8 00A7				     call fill
+     32
+     33	012E  B8 4C00		       @@end:	     mov ax, 4c00h
+     34	0131  CD 21				     int 21h
+     35
+     36	0133  40 00 0A*(00)	     buffer	     db	40h, 0h, 10 DUP(0h)
+     37	013F  63 6F 63 61 20 63	6F+  password	     db	'coca cola', 10	DUP(0h)
+     38	      6C 61 0A*(00)
+     39	0152  00		     flag	     db	0h
+     40	0153  3E 3A 28 28*(00) 24    wrong	     db	'>:(', 40 DUP(0h), '$'
+     41	017F  3A 29 28*(00) 24	     access	     db	':)', 40 DUP(0h), '$'
+     42
+     43	01AA			     check	     proc
+     44
+     45	01AA  B9 0009				     mov cx, PASS_LEN
+     46	01AD  0E 0E				     push cs cs
+     47	01AF  1F 07				     pop ds es
+     48	01B1  B8 0133r				     mov ax, offset buffer
+     49	01B4  05 0002				     add ax, 2h
+     50	01B7  8B F8				     mov di, ax
+     51	01B9  B8 013Fr				     mov ax, offset password
+     52	01BC  8B F0				     mov si, ax
+     53
+     54	01BE  26: 8A 05		       @@reps:	     mov al, es:[di]
+     55	01C1  8A 14				     mov dl, ds:[si]
+     56	01C3  3A C2				     cmp al, dl
+     57	01C5  74 08				     je	@@cont
+Turbo Assembler	 Version 4.1	    03/04/26 14:22:12	    Page 2
+crack.asm
+
+
+
+     58	01C7  C6 06 0152r 01			     mov flag, 1h
+     59	01CC  EB 06 90				     jmp @@break
+     60
+     61	01CF  46		       @@cont:	     inc si
+     62	01D0  47				     inc di
+     63	01D1  49				     dec cx
+     64	01D2  75 EA				     jne @@reps
+     65
+     66	01D4  C3		       @@break:	     ret
+     67	01D5					     endp
+     68
+     69	01D5			     fill	     proc
+     70
+     71	01D5  8A F4				     mov dh, ah
+     72	01D7  B8 B814				     mov ax, 0b814h
+     73	01DA  8E C0				     mov es, ax
+     74	01DC  BB FFFF				     mov bx, -1h
+     75	01DF  B8 0870				     mov ax, 2160d
+     76
+     77	01E2  83 C3 02		       @@reps:	     add bx, 2h
+     78	01E5  26: 88 37				     mov byte ptr es:[bx], dh
+     79	01E8  48				     dec ax
+     80	01E9  75 F7				     jne @@reps
+     81
+     82	01EB  C3				     ret
+     83	01EC					     endp
+     84
+     85				     end start
+Turbo Assembler	 Version 4.1	    03/04/26 14:22:12	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "03/04/26"
+??FILENAME			  Text	 "crack	  "
+??TIME				  Text	 "14:22:12"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@BREAK				  Near	 DGROUP:01D4
+@@CONT				  Near	 DGROUP:01CF
+@@END				  Near	 DGROUP:012E
+@@NO_ACCESS			  Near	 DGROUP:0122
+@@REPS				  Near	 DGROUP:01BE
+@@REPS				  Near	 DGROUP:01E2
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 CRACK
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+ACCESS				  Byte	 DGROUP:017F
+BUFFER				  Byte	 DGROUP:0133
+CHECK				  Near	 DGROUP:01AA
+FILL				  Near	 DGROUP:01D5
+FLAG				  Byte	 DGROUP:0152
+GREEN_YELL			  Number 002A
+PASSWORD			  Byte	 DGROUP:013F
+PASS_LEN			  Number 0009
+RED_YELL			  Number 004A
+START				  Near	 DGROUP:0100
+WRONG				  Byte	 DGROUP:0153
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  01EC Word	  Public  CODE
+
