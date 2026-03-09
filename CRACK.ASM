@@ -2,21 +2,26 @@
 .code
 org 100h
 
-PASS_LEN	equ 9h		; len of password
 RED_YELL	equ 4ah
 GREEN_YELL	equ 2ah
 
 locals @@
 
 start:		mov ah, 0ah
-		push cs
-		pop ds
 		mov dx, offset buffer
 		int 21h
 
-		call check
-		cmp flag, 0h
-		jne @@no_access
+		call CalcPass
+		call CalcBuff
+
+		mov ax, hash_pass
+		cmp ax, hash_buff
+		jne @@not_eq
+		mov flag, 1h
+
+		
+  @@not_eq:	cmp flag, 0h
+		je @@no_access
 		mov dx, offset access
 		mov ah, 09h
 		int 21h
@@ -33,34 +38,67 @@ start:		mov ah, 0ah
   @@end:	mov ax, 4c00h
 		int 21h
 
-buffer		db 40h, 0h, 10 DUP(0h)
-password	db 'coca cola', 10 DUP(0h)
+password	db 'coca cola$'
+buffer		db 0ffh, 0h, 20 DUP(0h)
+hash_pass	dw 0h
+hash_buff	dw 0h
 flag		db 0h
-wrong		db '>:(', 40 DUP(0h), '$'
-access		db ':)', 40 DUP(0h), '$'
+access		db 'Right password :)', 20 DUP(0h), '$'
+wrong		db 'Wrong password >:(', 20 DUP(0h), '$'
 
-check		proc
+CalcPass	proc
 
-		mov cx, PASS_LEN
-		push cs cs
-		pop ds es
-		mov ax, offset buffer
-		add ax, 2h
-		mov di, ax
-		mov ax, offset password
-		mov si, ax
+		mov bx, offset password
+		call GetLen
 
-  @@reps:	mov al, es:[di]
-		mov dl, ds:[si]
-		cmp al, dl
-		je @@cont
-		mov flag, 1h
-		jmp @@break
+		mov bx, offset password
+		call CalcHash
+		mov hash_pass, ax
 
-  @@cont:	inc si
-		inc di
+		ret
+		endp
+
+
+
+CalcBuff	proc
+
+		mov ch, 0h
+		mov bx, offset buffer
+		inc bx
+		mov cl, byte ptr [bx]
+		inc bx
+		
+		call CalcHash
+		mov hash_buff, ax
+
+		ret
+		endp
+
+
+
+CalcHash	proc
+
+		mov ax, 0h
+		mov dh, 0h
+  @@nxt_symb:	
+		mov dl, byte ptr [bx]
+		add ax, dx
+		inc bx
 		dec cx
-		jne @@reps
+		jne @@nxt_symb
+
+		ret
+		endp
+
+GetLen		proc
+
+		mov cx, 0h
+  @@nxt_symb:	
+		cmp byte ptr [bx], '$'
+		je @@break
+		inc bx
+		inc cx
+		jmp @@nxt_symb
 
   @@break:	ret
 		endp
