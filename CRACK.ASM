@@ -4,6 +4,7 @@ org 100h
 
 RED_YELL	equ 4ah
 GREEN_YELL	equ 2ah
+PRIME_DIGIT	equ 7h
 
 locals @@
 
@@ -78,14 +79,19 @@ CalcBuff	proc
 
 CalcHash	proc
 
+		mov si, bx
 		mov ax, 0h
-		mov dh, 0h
   @@nxt_symb:	
-		mov dl, byte ptr [bx]
+		mov dl, byte ptr [si]
+		mov dh, 0h
 		add ax, dx
-		inc bx
+		mov bx, PRIME_DIGIT
+		mul bx
+		inc si
 		dec cx
 		jne @@nxt_symb
+
+		mov bx, si
 
 		ret
 		endp
