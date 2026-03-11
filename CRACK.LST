@@ -1,4 +1,4 @@
-Turbo Assembler	 Version 4.1	    03/11/26 18:07:32	    Page 1
+Turbo Assembler	 Version 4.1	    03/11/26 19:10:47	    Page 1
 crack.asm
 
 
@@ -14,218 +14,219 @@ crack.asm
       9				     locals @@
      10
      11	0100			     start:
-     12	0100  E9 018E				     jmp main
+     12	0100  E9 018F				     jmp main
      13
      14	0103  72 6F 6E 61 6C 64	6F+  password	     db	'ronaldo better	than coca cola$'
      15	      20 62 65 74 74 65	72+
      16	      20 74 68 61 6E 20	63+
      17	      6F 63 61 20 63 6F	6C+
      18	      61 24
-     19	0121  FF*(00)		     screen_clear    db	0ffh DUP(0h)
-     20	0220  FF 00 1E*(00)	     buffer	     db	0ffh, 0h, 30 DUP(0h)
-     21	0240  00		     flag	     db	0h
-     22	0241  0000		     hash_pass	     dw	0h
-     23	0243  0000		     hash_buff	     dw	0h
-     24	0245  41 63 63 65 73 73	20+  access	     db	'Access	granted	:)', 20	DUP(0h), '$'
+     19	0121  0D FF*(00)	     screen_clear    db	0dh, 0ffh DUP(0h)
+     20	0221  FF 00 1E*(00)	     buffer	     db	0ffh, 0h, 30 DUP(0h)
+     21	0241  00		     flag	     db	0h
+     22	0242  0000		     hash_pass	     dw	0h
+     23	0244  0000		     hash_buff	     dw	0h
+     24	0246  41 63 63 65 73 73	20+  access	     db	'Access	granted	:)', 20	DUP(0h), '$'
      25	      67 72 61 6E 74 65	64+
      26	      20 3A 29 14*(00) 24
-     27	026B  41 63 63 65 73 73	20+  wrong	     db	'Access	denied >:(', 20	DUP(0h), '$'
+     27	026C  41 63 63 65 73 73	20+  wrong	     db	'Access	denied >:(', 20	DUP(0h), '$'
      28	      64 65 6E 69 65 64	20+
      29	      3E 3A 28 14*(00) 24
      30
      31				     ;=====================================================
-     32	0291  B4 0A		     main:	     mov ah, 0ah
-     33	0293  BA 0220r				     mov dx, offset buffer
-     34	0296  CD 21				     int 21h
+     32	0292  B4 0A		     main:	     mov ah, 0ah
+     33	0294  BA 0221r				     mov dx, offset buffer
+     34	0297  CD 21				     int 21h
      35
-     36	0298  E8 0023				     call ClearScreen
-     37
-     38	029B  E8 0056				     call CalcPass
-     39	029E  E8 0063				     call CalcBuff
-     40
-     41	02A1  A1 0241r				     mov ax, hash_pass
-     42	02A4  3B 06 0243r			     cmp ax, hash_buff
-     43	02A8  75 05				     jne @@not_eq
-     44	02AA  C6 06 0240r 01			     mov flag, 1h
-     45
-     46	02AF			       @@not_eq:
-     47	02AF  80 3E 0240r 00			     cmp flag, 0h
-     48	02B4  74 30				     je	denied
+     36	0299  E8 005F				     call CalcPass
+     37	029C  E8 006C				     call CalcBuff
+     38
+     39	029F  A1 0242r				     mov ax, hash_pass
+     40	02A2  3B 06 0244r			     cmp ax, hash_buff
+     41	02A6  75 05				     jne @@not_eq
+     42	02A8  C6 06 0241r 01			     mov flag, 1h
+     43
+     44	02AD			       @@not_eq:
+     45	02AD  80 3E 0241r 00			     cmp flag, 0h
+     46	02B2  74 36				     je	denied
+     47
+     48	02B4  EB 23 90				     jmp granted
      49
-     50	02B6  EB 20 90				     jmp granted
-     51
-     52	02B9			       end_main:
-     53	02B9  B8 4C00				     mov ax, 4c00h
-     54	02BC  CD 21				     int 21h
-     55				     ;-----------------------------------------------------
+     50	02B7			       end_main:
+     51	02B7  B8 4C00				     mov ax, 4c00h
+     52	02BA  CD 21				     int 21h
+     53				     ;-----------------------------------------------------
+     54
+     55
      56
-     57
-Turbo Assembler	 Version 4.1	    03/11/26 18:07:32	    Page 2
+     57				     ;=====================================================
+Turbo Assembler	 Version 4.1	    03/11/26 19:10:47	    Page 2
 crack.asm
 
 
 
-     58
+     58				     ; Clearing	screen from input string
      59				     ;=====================================================
-     60				     ; Clearing	screen from input string
-     61				     ;=====================================================
-     62	02BE			     ClearScreen     proc
-     63
-     64	02BE  BE 0220r				     lea si, buffer
-     65	02C1  B7 00				     mov bh, 0h
-     66	02C3  8A 5C 01				     mov bl, byte ptr [si + 1]
-     67
-     68	02C6  C6 87 0121r 0D			     mov screen_clear[bx], 0dh
-     69	02CB  C6 87 0122r 24			     mov screen_clear[bx + 1], '$'
-     70	02D0  BA 0121r				     lea dx, screen_clear
-     71	02D3  B4 09				     mov ah, 09h
-     72	02D5  CD 21				     int 21h
-     73
-     74	02D7  C3				     ret
-     75	02D8					     endp
-     76				     ;-----------------------------------------------------
+     60	02BC			     ClearScreen     proc
+     61
+     62	02BC  BE 0221r				     lea si, buffer
+     63	02BF  B7 00				     mov bh, 0h
+     64	02C1  8A 5C 01				     mov bl, byte ptr [si + 1]
+     65	02C4  80 C3 0A				     add bl, 0ah
+     66
+     67	02C7  C6 87 0121r 0D			     mov screen_clear[bx], 0dh
+     68	02CC  C6 87 0122r 24			     mov screen_clear[bx + 1], '$'
+     69	02D1  BA 0121r				     lea dx, screen_clear
+     70	02D4  B4 09				     mov ah, 09h
+     71	02D6  CD 21				     int 21h
+     72
+     73	02D8  C3				     ret
+     74	02D9					     endp
+     75				     ;-----------------------------------------------------
+     76
      77
      78
-     79
-     80				     ;=====================================================
-     81	02D8			     granted:
-     82	02D8  BA 0245r				     mov dx, offset access
-     83	02DB  B4 09				     mov ah, 09h
-     84	02DD  CD 21				     int 21h
-     85	02DF  B4 2A				     mov ah, GREEN_YELL
-     86	02E1  E8 0054				     call Fill
-     87	02E4  EB D3				     jmp end_main
+     79				     ;=====================================================
+     80	02D9			     granted:
+     81	02D9  E8 FFE0				     call ClearScreen
+     82	02DC  BA 0246r				     mov dx, offset access
+     83	02DF  B4 09				     mov ah, 09h
+     84	02E1  CD 21				     int 21h
+     85	02E3  B4 2A				     mov ah, GREEN_YELL
+     86	02E5  E8 0057				     call Fill
+     87	02E8  EB CD				     jmp end_main
      88				     ;-----------------------------------------------------
      89
      90
      91
      92				     ;=====================================================
-     93	02E6			     denied:
-     94	02E6  BA 026Br				     mov dx, offset wrong
-     95	02E9  B4 09				     mov ah, 09h
-     96	02EB  CD 21				     int 21h
-     97	02ED  B4 4A				     mov ah, RED_YELL
-     98	02EF  E8 0046				     call Fill
-     99	02F2  EB C5				     jmp end_main
-    100				     ;-----------------------------------------------------
-    101
+     93	02EA			     denied:
+     94	02EA  E8 FFCF				     call ClearScreen
+     95	02ED  BA 026Cr				     mov dx, offset wrong
+     96	02F0  B4 09				     mov ah, 09h
+     97	02F2  CD 21				     int 21h
+     98	02F4  B4 4A				     mov ah, RED_YELL
+     99	02F6  E8 0046				     call Fill
+    100	02F9  EB BC				     jmp end_main
+    101				     ;-----------------------------------------------------
     102
     103
-    104				     ;=====================================================
-    105				     ; Calcing hash of password
-    106				     ;=====================================================
-    107	02F4			     CalcPass	     proc
-    108
-    109	02F4  BB 0103r				     mov bx, offset password
-    110	02F7  E8 0031				     call GetLen
-    111
-    112	02FA  BB 0103r				     mov bx, offset password
-    113	02FD  E8 0014				     call CalcHash
-    114	0300  A3 0241r				     mov hash_pass, ax
-Turbo Assembler	 Version 4.1	    03/11/26 18:07:32	    Page 3
+    104
+    105				     ;=====================================================
+    106				     ; Calcing hash of password
+    107				     ;=====================================================
+    108	02FB			     CalcPass	     proc
+    109
+    110	02FB  BB 0103r				     mov bx, offset password
+    111	02FE  E8 0031				     call GetLen
+    112
+    113	0301  BB 0103r				     mov bx, offset password
+    114	0304  E8 0014				     call CalcHash
+Turbo Assembler	 Version 4.1	    03/11/26 19:10:47	    Page 3
 crack.asm
 
 
 
-    115
-    116	0303  C3				     ret
-    117	0304					     endp
-    118				     ;-----------------------------------------------------
-    119
+    115	0307  A3 0242r				     mov hash_pass, ax
+    116
+    117	030A  C3				     ret
+    118	030B					     endp
+    119				     ;-----------------------------------------------------
     120
     121
-    122				     ;=====================================================
-    123				     ; Calcing hash of string from buffer
-    124				     ;=====================================================
-    125	0304			     CalcBuff	     proc
-    126
-    127	0304  B5 00				     mov ch, 0h
-    128	0306  BB 0220r				     mov bx, offset buffer
-    129	0309  43				     inc bx
-    130	030A  8A 0F				     mov cl, byte ptr [bx]
-    131	030C  43				     inc bx
-    132
-    133	030D  E8 0004				     call CalcHash
-    134	0310  A3 0243r				     mov hash_buff, ax
-    135
-    136	0313  C3				     ret
-    137	0314					     endp
-    138				     ;-----------------------------------------------------
-    139
+    122
+    123				     ;=====================================================
+    124				     ; Calcing hash of string from buffer
+    125				     ;=====================================================
+    126	030B			     CalcBuff	     proc
+    127
+    128	030B  B5 00				     mov ch, 0h
+    129	030D  BB 0221r				     mov bx, offset buffer
+    130	0310  43				     inc bx
+    131	0311  8A 0F				     mov cl, byte ptr [bx]
+    132	0313  43				     inc bx
+    133
+    134	0314  E8 0004				     call CalcHash
+    135	0317  A3 0244r				     mov hash_buff, ax
+    136
+    137	031A  C3				     ret
+    138	031B					     endp
+    139				     ;-----------------------------------------------------
     140
     141
-    142				     ;=====================================================
-    143				     ; Getting hash of string, which start in [BX], and
-    144				     ; has length = CX
-    145				     ;=====================================================
-    146	0314			     CalcHash	     proc
-    147
-    148	0314  8B F3				     mov si, bx
-    149	0316  B8 0000				     mov ax, 0h
-    150	0319			       @@nxt_symb:
-    151	0319  8A 14				     mov dl, byte ptr [si]
-    152	031B  B6 00				     mov dh, 0h
-    153	031D  03 C2				     add ax, dx
-    154	031F  BB 0007				     mov bx, PRIME_DIGIT
-    155	0322  F7 E3				     mul bx
-    156	0324  46				     inc si
-    157	0325  49				     dec cx
-    158	0326  75 F1				     jne @@nxt_symb
-    159
-    160	0328  8B DE				     mov bx, si
-    161
-    162	032A  C3				     ret
-    163	032B					     endp
-    164				     ;-----------------------------------------------------
-    165
+    142
+    143				     ;=====================================================
+    144				     ; Getting hash of string, which start in [BX], and
+    145				     ; has length = CX
+    146				     ;=====================================================
+    147	031B			     CalcHash	     proc
+    148
+    149	031B  8B F3				     mov si, bx
+    150	031D  B8 0000				     mov ax, 0h
+    151	0320			       @@nxt_symb:
+    152	0320  8A 14				     mov dl, byte ptr [si]
+    153	0322  B6 00				     mov dh, 0h
+    154	0324  03 C2				     add ax, dx
+    155	0326  BB 0007				     mov bx, PRIME_DIGIT
+    156	0329  F7 E3				     mul bx
+    157	032B  46				     inc si
+    158	032C  49				     dec cx
+    159	032D  75 F1				     jne @@nxt_symb
+    160
+    161	032F  8B DE				     mov bx, si
+    162
+    163	0331  C3				     ret
+    164	0332					     endp
+    165				     ;-----------------------------------------------------
     166
     167
-    168				     ;=====================================================
-    169				     ; Getting length of string, which ended '$'
-    170				     ;=====================================================
-    171	032B			     GetLen	     proc
-Turbo Assembler	 Version 4.1	    03/11/26 18:07:32	    Page 4
+    168
+    169				     ;=====================================================
+    170				     ; Getting length of string, which ended '$'
+    171				     ;=====================================================
+Turbo Assembler	 Version 4.1	    03/11/26 19:10:47	    Page 4
 crack.asm
 
 
 
-    172
-    173	032B  B9 0000				     mov cx, 0h
-    174	032E			       @@nxt_symb:
-    175	032E  80 3F 24				     cmp byte ptr [bx],	'$'
-    176	0331  74 04				     je	@@break
-    177	0333  43				     inc bx
-    178	0334  41				     inc cx
-    179	0335  EB F7				     jmp @@nxt_symb
-    180
-    181	0337  C3		       @@break:	     ret
-    182	0338					     endp
-    183				     ;-----------------------------------------------------
-    184
+    172	0332			     GetLen	     proc
+    173
+    174	0332  B9 0000				     mov cx, 0h
+    175	0335			       @@nxt_symb:
+    176	0335  80 3F 24				     cmp byte ptr [bx],	'$'
+    177	0338  74 04				     je	@@break
+    178	033A  43				     inc bx
+    179	033B  41				     inc cx
+    180	033C  EB F7				     jmp @@nxt_symb
+    181
+    182	033E  C3		       @@break:	     ret
+    183	033F					     endp
+    184				     ;-----------------------------------------------------
     185
     186
-    187				     ;=====================================================
-    188				     ; Filling the entire screen in one	color (in AH)
-    189				     ;=====================================================
-    190	0338			     Fill	     proc
-    191
-    192	0338  8A F4				     mov dh, ah
-    193	033A  B8 B814				     mov ax, 0b814h
-    194	033D  8E C0				     mov es, ax
-    195	033F  BB FFFF				     mov bx, -1h
-    196	0342  B8 0870				     mov ax, 2160d
-    197
-    198	0345  83 C3 02		       @@reps:	     add bx, 2h
-    199	0348  26: 88 37				     mov byte ptr es:[bx], dh
-    200	034B  48				     dec ax
-    201	034C  75 F7				     jne @@reps
-    202
-    203	034E  C3				     ret
-    204	034F					     endp
-    205				     ;-----------------------------------------------------
-    206
-    207				     end start
-Turbo Assembler	 Version 4.1	    03/11/26 18:07:32	    Page 5
+    187
+    188				     ;=====================================================
+    189				     ; Filling the entire screen in one	color (in AH)
+    190				     ;=====================================================
+    191	033F			     Fill	     proc
+    192
+    193	033F  8A F4				     mov dh, ah
+    194	0341  B8 B814				     mov ax, 0b814h
+    195	0344  8E C0				     mov es, ax
+    196	0346  BB FFFF				     mov bx, -1h
+    197	0349  B8 0870				     mov ax, 2160d
+    198
+    199	034C  83 C3 02		       @@reps:	     add bx, 2h
+    200	034F  26: 88 37				     mov byte ptr es:[bx], dh
+    201	0352  48				     dec ax
+    202	0353  75 F7				     jne @@reps
+    203
+    204	0355  C3				     ret
+    205	0356					     endp
+    206				     ;-----------------------------------------------------
+    207
+    208				     end start
+Turbo Assembler	 Version 4.1	    03/11/26 19:10:47	    Page 5
 Symbol Table
 
 
@@ -235,14 +236,14 @@ Symbol Name			  Type	 Value
 
 ??DATE				  Text	 "03/11/26"
 ??FILENAME			  Text	 "crack	  "
-??TIME				  Text	 "18:07:31"
+??TIME				  Text	 "19:10:47"
 ??VERSION			  Number 040A
 @32BIT				  Text	 0
-@@BREAK				  Near	 DGROUP:0337
-@@NOT_EQ			  Near	 DGROUP:02AF
-@@NXT_SYMB			  Near	 DGROUP:0319
-@@NXT_SYMB			  Near	 DGROUP:032E
-@@REPS				  Near	 DGROUP:0345
+@@BREAK				  Near	 DGROUP:033E
+@@NOT_EQ			  Near	 DGROUP:02AD
+@@NXT_SYMB			  Near	 DGROUP:0320
+@@NXT_SYMB			  Near	 DGROUP:0335
+@@REPS				  Near	 DGROUP:034C
 @CODE				  Text	 DGROUP
 @CODESIZE			  Text	 0
 @CPU				  Text	 0101H
@@ -254,32 +255,32 @@ Symbol Name			  Type	 Value
 @MODEL				  Text	 1
 @STACK				  Text	 DGROUP
 @WORDSIZE			  Text	 2
-ACCESS				  Byte	 DGROUP:0245
-BUFFER				  Byte	 DGROUP:0220
-CALCBUFF			  Near	 DGROUP:0304
-CALCHASH			  Near	 DGROUP:0314
-CALCPASS			  Near	 DGROUP:02F4
-CLEARSCREEN			  Near	 DGROUP:02BE
-DENIED				  Near	 DGROUP:02E6
-END_MAIN			  Near	 DGROUP:02B9
-FILL				  Near	 DGROUP:0338
-FLAG				  Byte	 DGROUP:0240
-GETLEN				  Near	 DGROUP:032B
-GRANTED				  Near	 DGROUP:02D8
+ACCESS				  Byte	 DGROUP:0246
+BUFFER				  Byte	 DGROUP:0221
+CALCBUFF			  Near	 DGROUP:030B
+CALCHASH			  Near	 DGROUP:031B
+CALCPASS			  Near	 DGROUP:02FB
+CLEARSCREEN			  Near	 DGROUP:02BC
+DENIED				  Near	 DGROUP:02EA
+END_MAIN			  Near	 DGROUP:02B7
+FILL				  Near	 DGROUP:033F
+FLAG				  Byte	 DGROUP:0241
+GETLEN				  Near	 DGROUP:0332
+GRANTED				  Near	 DGROUP:02D9
 GREEN_YELL			  Number 002A
-HASH_BUFF			  Word	 DGROUP:0243
-HASH_PASS			  Word	 DGROUP:0241
-MAIN				  Near	 DGROUP:0291
+HASH_BUFF			  Word	 DGROUP:0244
+HASH_PASS			  Word	 DGROUP:0242
+MAIN				  Near	 DGROUP:0292
 PASSWORD			  Byte	 DGROUP:0103
 PRIME_DIGIT			  Number 0007
 RED_YELL			  Number 004A
 SCREEN_CLEAR			  Byte	 DGROUP:0121
 START				  Near	 DGROUP:0100
-WRONG				  Byte	 DGROUP:026B
+WRONG				  Byte	 DGROUP:026C
 
 Groups & Segments		  Bit Size Align  Combine Class
 
 DGROUP				  Group
   _DATA				  16  0000 Word	  Public  DATA
-  _TEXT				  16  034F Word	  Public  CODE
+  _TEXT				  16  0356 Word	  Public  CODE
 

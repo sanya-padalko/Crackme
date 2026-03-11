@@ -12,7 +12,7 @@ start:
 		jmp main
 
 password	db 'ronaldo better than coca cola$'
-screen_clear	db 0ffh DUP(0h)
+screen_clear	db 0dh, 0ffh DUP(0h)
 buffer		db 0ffh, 0h, 30 DUP(0h)
 flag		db 0h
 hash_pass	dw 0h
@@ -24,8 +24,6 @@ wrong		db 'Access denied >:(', 20 DUP(0h), '$'
 main:		mov ah, 0ah
 		mov dx, offset buffer
 		int 21h
-
-		call ClearScreen
 
 		call CalcPass
 		call CalcBuff
@@ -49,28 +47,8 @@ main:		mov ah, 0ah
 
 
 ;=====================================================
-; Clearing screen from input string
-;=====================================================
-ClearScreen	proc
-
-		lea si, buffer
-		mov bh, 0h
-		mov bl, byte ptr [si + 1]
-
-		mov screen_clear[bx], 0dh
-		mov screen_clear[bx + 1], '$'
-		lea dx, screen_clear
-		mov ah, 09h
-		int 21h
-
-		ret
-		endp
-;-----------------------------------------------------
-
-
-
-;=====================================================
 granted:
+		call ClearScreen
 		mov dx, offset access
 		mov ah, 09h
 		int 21h
@@ -83,12 +61,35 @@ granted:
 
 ;=====================================================
 denied:
+		call ClearScreen
 		mov dx, offset wrong
 		mov ah, 09h
 		int 21h
 		mov ah, RED_YELL
 		call Fill
 		jmp end_main
+;-----------------------------------------------------
+
+
+
+;=====================================================
+; Clearing screen from input string
+;=====================================================
+ClearScreen	proc
+
+		lea si, buffer
+		mov bh, 0h
+		mov bl, byte ptr [si + 1]
+		add bl, 0ah
+
+		mov screen_clear[bx], 0dh
+		mov screen_clear[bx + 1], '$'
+		lea dx, screen_clear
+		mov ah, 09h
+		int 21h
+
+		ret
+		endp
 ;-----------------------------------------------------
 
 
