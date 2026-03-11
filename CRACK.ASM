@@ -8,6 +8,7 @@ PRIME_DIGIT	equ 7h
 
 locals @@
 
+;=====================================================
 start:		mov ah, 0ah
 		mov dx, offset buffer
 		int 21h
@@ -20,8 +21,8 @@ start:		mov ah, 0ah
 		jne @@not_eq
 		mov flag, 1h
 
-		
-  @@not_eq:	cmp flag, 0h
+  @@not_eq:
+  		cmp flag, 0h
 		je @@no_access
 		mov dx, offset access
 		mov ah, 09h
@@ -30,23 +31,23 @@ start:		mov ah, 0ah
 		call fill
 		jmp @@end
 
-  @@no_access:	mov dx, offset wrong
+  @@no_access:
+  		mov dx, offset wrong
 		mov ah, 09h
 		int 21h
 		mov ah, RED_YELL
 		call fill
 
-  @@end:	mov ax, 4c00h
+  @@end:
+  		mov ax, 4c00h
 		int 21h
+;-----------------------------------------------------
 
-password	db 'coca cola$'
-buffer		db 0ffh, 0h, 20 DUP(0h)
-hash_pass	dw 0h
-hash_buff	dw 0h
-flag		db 0h
-access		db 'Right password :)', 20 DUP(0h), '$'
-wrong		db 'Wrong password >:(', 20 DUP(0h), '$'
 
+
+;=====================================================
+; Calcing hash of password
+;=====================================================
 CalcPass	proc
 
 		mov bx, offset password
@@ -58,9 +59,13 @@ CalcPass	proc
 
 		ret
 		endp
+;-----------------------------------------------------
 
 
 
+;=====================================================
+; Calcing hash of string from buffer
+;=====================================================
 CalcBuff	proc
 
 		mov ch, 0h
@@ -68,20 +73,25 @@ CalcBuff	proc
 		inc bx
 		mov cl, byte ptr [bx]
 		inc bx
-		
+
 		call CalcHash
 		mov hash_buff, ax
 
 		ret
 		endp
+;-----------------------------------------------------
 
 
 
+;=====================================================
+; Getting hash of string, which start in [BX], and
+; has length = CX
+;=====================================================
 CalcHash	proc
 
 		mov si, bx
 		mov ax, 0h
-  @@nxt_symb:	
+  @@nxt_symb:
 		mov dl, byte ptr [si]
 		mov dh, 0h
 		add ax, dx
@@ -95,11 +105,17 @@ CalcHash	proc
 
 		ret
 		endp
+;-----------------------------------------------------
 
+
+
+;=====================================================
+; Getting length of string, which ended '$'
+;=====================================================
 GetLen		proc
 
 		mov cx, 0h
-  @@nxt_symb:	
+  @@nxt_symb:
 		cmp byte ptr [bx], '$'
 		je @@break
 		inc bx
@@ -108,7 +124,13 @@ GetLen		proc
 
   @@break:	ret
 		endp
+;-----------------------------------------------------
 
+
+
+;=====================================================
+; Filling the entire screen in one color (in AH)
+;=====================================================
 fill		proc
 
 		mov dh, ah
@@ -124,5 +146,15 @@ fill		proc
 
 		ret
 		endp
+;-----------------------------------------------------
+
+
+password	db 'ronaldo better than coca cola$'
+buffer		db 0ffh, 0h, 30 DUP(0h)
+hash_pass	dw 0h
+hash_buff	dw 0h
+flag		db 0h
+access		db 'Access granted :)', 20 DUP(0h), '$'
+wrong		db 'Access denied >:(', 20 DUP(0h), '$'
 
 end start
