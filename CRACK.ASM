@@ -8,10 +8,24 @@ PRIME_DIGIT	equ 7h
 
 locals @@
 
+start:
+		jmp main
+
+password	db 'ronaldo better than coca cola$'
+screen_clear	db 0ffh DUP(0h)
+buffer		db 0ffh, 0h, 30 DUP(0h)
+flag		db 0h
+hash_pass	dw 0h
+hash_buff	dw 0h
+access		db 'Access granted :)', 20 DUP(0h), '$'
+wrong		db 'Access denied >:(', 20 DUP(0h), '$'
+
 ;=====================================================
-start:		mov ah, 0ah
+main:		mov ah, 0ah
 		mov dx, offset buffer
 		int 21h
+
+		call ClearScreen
 
 		call CalcPass
 		call CalcBuff
@@ -23,24 +37,58 @@ start:		mov ah, 0ah
 
   @@not_eq:
   		cmp flag, 0h
-		je @@no_access
+		je denied
+
+		jmp granted
+
+  end_main:
+  		mov ax, 4c00h
+		int 21h
+;-----------------------------------------------------
+
+
+
+;=====================================================
+; Clearing screen from input string
+;=====================================================
+ClearScreen	proc
+
+		lea si, buffer
+		mov bh, 0h
+		mov bl, byte ptr [si + 1]
+
+		mov screen_clear[bx], 0dh
+		mov screen_clear[bx + 1], '$'
+		lea dx, screen_clear
+		mov ah, 09h
+		int 21h
+
+		ret
+		endp
+;-----------------------------------------------------
+
+
+
+;=====================================================
+granted:
 		mov dx, offset access
 		mov ah, 09h
 		int 21h
 		mov ah, GREEN_YELL
-		call fill
-		jmp @@end
+		call Fill
+		jmp end_main
+;-----------------------------------------------------
 
-  @@no_access:
-  		mov dx, offset wrong
+
+
+;=====================================================
+denied:
+		mov dx, offset wrong
 		mov ah, 09h
 		int 21h
 		mov ah, RED_YELL
-		call fill
-
-  @@end:
-  		mov ax, 4c00h
-		int 21h
+		call Fill
+		jmp end_main
 ;-----------------------------------------------------
 
 
@@ -131,7 +179,7 @@ GetLen		proc
 ;=====================================================
 ; Filling the entire screen in one color (in AH)
 ;=====================================================
-fill		proc
+Fill		proc
 
 		mov dh, ah
 		mov ax, 0b814h
@@ -147,14 +195,5 @@ fill		proc
 		ret
 		endp
 ;-----------------------------------------------------
-
-
-password	db 'ronaldo better than coca cola$'
-buffer		db 0ffh, 0h, 30 DUP(0h)
-hash_pass	dw 0h
-hash_buff	dw 0h
-flag		db 0h
-access		db 'Access granted :)', 20 DUP(0h), '$'
-wrong		db 'Access denied >:(', 20 DUP(0h), '$'
 
 end start
